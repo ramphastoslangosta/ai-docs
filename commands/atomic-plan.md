@@ -12,22 +12,85 @@ Create a detailed, step-by-step execution plan for completing a specific task in
 
 ### Locate and Read Task Details
 ```bash
-# Find task in tasks.csv
-TASK_ID="${1:-$(grep ",pending," tasks.csv | head -1 | cut -d',' -f1)}"
+# SECURITY NOTE: Command Injection Prevention (CWE-78)
+# All user-supplied input (TASK_ID) is validated before use in commands
+# to prevent OS command injection attacks. This follows OWASP A03:2021
+# (Injection) mitigation guidelines.
+#
+# Attack vectors blocked:
+# - Semicolon injection: TASK-001; rm -rf /
+# - Backtick injection: TASK-`whoami`-001
+# - Command substitution: TASK-$(whoami)-001
+# - Path traversal: ../../../etc/passwd
+#
+# Defense strategy:
+# 1. Validate TASK_ID format with strict regex
+# 2. Validate file existence before reading
+# 3. Validate workspace paths to prevent directory escapes
+#
+# Source validation library for input sanitization
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LIB_DIR="$(dirname "$SCRIPT_DIR")/.claude/lib"
 
+if [ -f "$LIB_DIR/input-validation.sh" ]; then
+    source "$LIB_DIR/input-validation.sh"
+else
+    echo "❌ ERROR: Input validation library not found"
+    echo "Expected: $LIB_DIR/input-validation.sh"
+    echo "Run: TASK-20251008-003 to create validation library"
+    exit 1
+fi
+
+# Get TASK_ID from argument
+TASK_ID="${1}"
+
+# If no TASK_ID provided, find first pending task
 if [ -z "$TASK_ID" ]; then
-    echo "❌ No task ID provided and no pending tasks found"
-    echo "Usage: /atomic-plan TASK-ID"
+    # Validate tasks.csv exists before reading
+    if ! validate_file_readable "tasks.csv"; then
+        echo "❌ ERROR: tasks.csv not found or not readable"
+        echo "Run: /generate_tasks to create tasks.csv"
+        exit 1
+    fi
+
+    # Find first pending task
+    TASK_ID=$(grep ",pending," tasks.csv 2>/dev/null | head -1 | cut -d',' -f1)
+
+    if [ -z "$TASK_ID" ]; then
+        echo "❌ ERROR: No pending tasks found in tasks.csv"
+        echo "Usage: /atomic-plan TASK-ID"
+        echo ""
+        echo "Available tasks:"
+        grep -v "^task_id," tasks.csv | cut -d',' -f1,2,5 | head -5
+        exit 1
+    fi
+fi
+
+# SECURITY: Validate TASK_ID format before using in any commands
+echo "🔒 Validating TASK_ID: $TASK_ID"
+if ! validate_task_id "$TASK_ID"; then
+    echo ""
+    echo "Security: TASK_ID validation failed"
+    echo "This prevents command injection attacks"
     exit 1
 fi
 
 echo "📋 Planning execution for: $TASK_ID"
 echo ""
 
-# Extract task details
-TASK_ROW=$(grep "^$TASK_ID," tasks.csv)
+# Validate tasks.csv is readable
+if ! validate_file_readable "tasks.csv"; then
+    echo "❌ ERROR: tasks.csv not found or not readable"
+    exit 1
+fi
+
+# Extract task details (now safe - TASK_ID is validated above)
+TASK_ROW=$(grep "^$TASK_ID," tasks.csv 2>/dev/null)
 if [ -z "$TASK_ROW" ]; then
     echo "❌ Task $TASK_ID not found in tasks.csv"
+    echo ""
+    echo "Available tasks:"
+    grep -v "^task_id," tasks.csv | cut -d',' -f1,2 | head -10
     exit 1
 fi
 
@@ -326,8 +389,18 @@ echo ""
 
 ### Setup Workspace
 ```bash
-# Create task-specific workspace directory
-WORKSPACE_DIR=".claude/workspace/$TASK_ID"
+# SECURITY: Validate workspace directory path to prevent path traversal
+# This prevents attacks like: /atomic-plan "../../../etc"
+echo "🔒 Validating workspace directory..."
+WORKSPACE_DIR=$(validate_workspace_dir "$TASK_ID")
+
+if [ $? -ne 0 ]; then
+    echo "❌ ERROR: Workspace directory validation failed"
+    echo "This prevents path traversal attacks"
+    exit 1
+fi
+
+# Create task-specific workspace directory (now safe - path validated)
 mkdir -p "$WORKSPACE_DIR"
 
 echo "📁 Task workspace created: $WORKSPACE_DIR"
