@@ -120,3 +120,31 @@ validate_workspace_dir() {
     echo "$canonical_path"
     return 0
 }
+
+# Validate file exists and is readable
+# Arguments:
+#   $1 - file_path: Path to file
+# Returns:
+#   0 if file exists and is readable, 1 otherwise
+# Example:
+#   validate_file_readable "tasks.csv" && echo "File OK"
+validate_file_readable() {
+    local file_path="$1"
+
+    if [[ -z "$file_path" ]]; then
+        echo "❌ ERROR: File path is empty" >&2
+        return 1
+    fi
+
+    if [[ ! -f "$file_path" ]]; then
+        echo "❌ ERROR: File not found: $file_path" >&2
+        return 1
+    fi
+
+    if [[ ! -r "$file_path" ]]; then
+        echo "❌ ERROR: File not readable: $file_path" >&2
+        return 1
+    fi
+
+    return 0
+}
