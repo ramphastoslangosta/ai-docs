@@ -1,0 +1,15 @@
+- [x] Input validation library sourced at command start
+- [x] All TASK_ID values validated before use in commands
+- [x] Malicious TASK_ID inputs rejected with clear error messages
+- [x] Valid TASK_ID inputs continue to work without behavior changes
+- [x] File existence checks added for tasks.csv
+- [x] Atomic commit made with descriptive security message
+- [x] Manual testing confirms injection attacks are blocked
+- [x] `/atomic-plan` command still generates plans successfully
+- [x] All test checkpoints passed
+- [x] Malicious inputs blocked
+- [x] Valid inputs still work
+- [x] Atomic commit created
+- [x] Workspace notes updated
+- [x] Ready for TASK-005 (execute-task.md patch)
+- [ ] tasks.csv status updated to "completed"
