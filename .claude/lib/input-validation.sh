@@ -35,3 +35,60 @@ validate_task_id() {
 
     return 0
 }
+
+# Sanitize path to prevent directory traversal
+# Arguments:
+#   $1 - path: Path to sanitize
+#   $2 - base_dir: Base directory (default: current directory)
+# Returns:
+#   0 and prints canonical path if safe, 1 if dangerous
+# Example:
+#   canonical_path=$(sanitize_path "workspace/TASK-001" ".")
+sanitize_path() {
+    local path="$1"
+    local base_dir="${2:-.}"
+
+    # Reject paths containing ..
+    if [[ "$path" == *".."* ]]; then
+        echo "❌ ERROR: Path contains directory traversal (..) - rejected for security" >&2
+        return 1
+    fi
+
+    # Reject absolute paths (unless base_dir is also absolute and matching)
+    if [[ "$path" == /* ]]; then
+        echo "❌ ERROR: Absolute paths not allowed - rejected for security" >&2
+        return 1
+    fi
+
+    # Canonicalize path (macOS compatible)
+    local canonical_path
+    local canonical_base
+
+    # Get canonical base directory first
+    if ! canonical_base=$(cd "$base_dir" 2>/dev/null && pwd); then
+        echo "❌ ERROR: Cannot access base directory: $base_dir" >&2
+        return 1
+    fi
+
+    # Combine paths
+    local combined_path="$canonical_base/$path"
+
+    # Canonicalize if exists, otherwise construct manually
+    if [ -e "$combined_path" ]; then
+        canonical_path=$(realpath "$combined_path" 2>/dev/null || echo "$combined_path")
+    else
+        # For non-existent paths, construct canonical path manually
+        canonical_path="$combined_path"
+    fi
+
+    # Verify path is within base directory
+    if [[ "$canonical_path" != "$canonical_base"* ]]; then
+        echo "❌ ERROR: Path escapes base directory - rejected for security" >&2
+        echo "  Attempted: $canonical_path" >&2
+        echo "  Allowed base: $canonical_base" >&2
+        return 1
+    fi
+
+    echo "$canonical_path"
+    return 0
+}
