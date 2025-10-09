@@ -1,0 +1,53 @@
+++ git branch --show-current
++ COMPOSE_FILE='echo DRY'
++ RUN: 'docker-compose.test.yml
+CONTAINER_NAME=ventanas-test-app
+HEALTH_ENDPOINT=http://localhost:8001/api/health
+MAX_WAIT=60  # seconds
+
+echo ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+echo ' TEST ENVIRONMENT DEPLOYMENT - 'START
+echo ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+echo 
+
+# === PRE-DEPLOYMENT VERIFICATION ===
+echo 📋' Pre-deployment 'verification...
+echo Current' branch: 'devops/docker-build-improvements-20251001
+echo Current' 'commit:
+git log --oneline -1
+echo 
+
+# === STOP CONTAINERS ===
+echo ⏹️' Stopping test 'containers...
+echo DRY' RUN: docker-compose -f '' down
++ true
++ echo '✅ Test containers stopped'
+✅ Test containers stopped
++ echo ''
+
++ echo '🔨 Building test environment with --no-cache...'
+🔨 Building test environment with --no-cache...
++ echo 'DRY RUN: docker-compose -f  build --no-cache app
+echo ✅' Build 'complete
+echo 
+
+# === START CONTAINERS ===
+echo 🚀' Starting test 'containers...
+echo DRY' RUN: docker-compose -f '' up -d
+DRY RUN: docker-compose -f  build --no-cache app
+echo ✅ Build complete
+echo 
+
+# === START CONTAINERS ===
+echo 🚀 Starting test containers...
+echo DRY RUN: docker-compose -f  up -d
++ echo '✅ Test containers started'
+✅ Test containers started
++ echo ''
+
++ echo '⏳ Waiting for test application to be healthy...'
+⏳ Waiting for test application to be healthy...
++ ELAPSED=0
++ '[' 0 -lt ']'
+scripts/deploy-test-dryrun.sh: line 46: [: 0: unary operator expected
+scripts/deploy-test-dryrun.sh: line 77: syntax error: unexpected end of file

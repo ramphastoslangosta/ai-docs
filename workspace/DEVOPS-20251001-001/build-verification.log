@@ -1,0 +1,12 @@
+#13 [ 9/11] RUN echo "=== Build Verification ===" &&     echo "Checking main.py imports..." &&     python -c "import sys; sys.path.insert(0, '.'); import main; print('✅ main.py imports successfully')" &&     echo "Checking app structure..." &&     test -d app/routes && echo "✅ app/routes exists" || echo "⚠️ app/routes missing" &&     test -f config.py && echo "✅ config.py exists" || echo "❌ config.py missing" &&     echo "Checking route count..." &&     python -c "import main; print(f'✅ {len(main.app.routes)} routes registered')" &&     echo "=== Build verification complete ==="
+#13 0.107 === Build Verification ===
+#13 0.107 Checking main.py imports...
+#13 1.130 ✅ main.py imports successfully
+#13 1.277 Checking app structure...
+#13 1.277 ✅ app/routes exists
+#13 1.277 ✅ config.py exists
+#13 1.277 Checking route count...
+#13 2.151 ✅ 95 routes registered
+#13 2.255 === Build verification complete ===
+#13 DONE 2.3s
+

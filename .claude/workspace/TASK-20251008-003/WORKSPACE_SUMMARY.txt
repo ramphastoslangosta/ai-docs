@@ -1,0 +1,232 @@
+=================================================================================
+WORKSPACE CREATED: TASK-20251008-003
+Add Input Validation Library
+=================================================================================
+
+Created: 2025-10-09
+Status: Ready for Execution
+Priority: CRITICAL
+Phase: 1/3 (Critical Infrastructure & Security)
+
+=================================================================================
+WORKSPACE CONTENTS
+=================================================================================
+
+File                                    Lines   Size    Purpose
+--------------------------------------------------------------------------------
+atomic-plan-TASK-20251008-003.md        834    25KB    Detailed implementation plan
+checklist-TASK-20251008-003.md          186     5KB    95 progress tracking items
+README.md                               284     7KB    Quick reference guide
+notes.md                                253     7KB    Session notes & observations
+WORKSPACE_SUMMARY.txt                     -      -     This file
+
+Total: 1,557 lines of documentation
+
+=================================================================================
+EXECUTION SUMMARY
+=================================================================================
+
+**Objective**: Create .claude/lib/input-validation.sh with 4 validation functions
+to prevent command injection (CWE-78) and path traversal attacks.
+
+**Deliverables**:
+1. .claude/lib/input-validation.sh (4 functions + exports)
+2. .claude/lib/input-validation-example.sh (usage example)
+
+**Security Impact**: 
+- Addresses 21 command injection vulnerabilities
+- Blocks 7 attack vector types
+- Risk reduction: CRITICAL -> LOW
+
+**Estimated Time**: 3 hours 6 minutes
+
+**Phase Breakdown**:
+- Preparation: 16 minutes (6 steps)
+- Implementation: 90 minutes (5 functions)
+- Finalization: 30 minutes (testing + example)
+- Documentation: 20 minutes (notes + commit)
+
+=================================================================================
+IMPLEMENTATION PHASES
+=================================================================================
+
+PHASE 1: PREPARATION (16 minutes)
+  - Verify git repository initialized
+  - Create .claude/lib/ directory
+  - Review code review report (lines 646-730)
+  - Checkout feature branch (infrastructure/critical-setup-20251008)
+
+PHASE 2: IMPLEMENTATION (90 minutes)
+  - Step 2.1: Create library file with header (10 min)
+  - Step 2.2: Implement validate_task_id() (20 min)
+  - Step 2.3: Implement sanitize_path() (25 min)
+  - Step 2.4: Implement validate_workspace_dir() (20 min)
+  - Step 2.5: Implement validate_file_readable() (15 min)
+
+PHASE 3: FINALIZATION (30 minutes)
+  - Step 3.1: Export all functions (10 min)
+  - Step 3.2: Run comprehensive test suite (15 min)
+  - Step 3.3: Create usage example (5 min)
+
+PHASE 4: DOCUMENTATION & COMMIT (20 minutes)
+  - Step 4.1: Update workspace notes (5 min)
+  - Step 4.2: Stage and commit all changes (10 min)
+  - Step 4.3: Update tasks.csv status (5 min)
+
+=================================================================================
+VALIDATION FUNCTIONS
+=================================================================================
+
+1. validate_task_id(task_id)
+   - Validates: ^(TASK|ARCH|HOTFIX|DEVOPS|MTENANT|PROCESS)-[0-9]{8}-[0-9]{3}$
+   - Returns: 0 if valid, 1 if invalid
+   - Blocks: Command injection via TASK_ID parameter
+
+2. sanitize_path(path, base_dir)
+   - Prevents: Directory traversal (..) and absolute path escapes
+   - Returns: Canonical path if safe, exits 1 if dangerous
+   - Uses: realpath -m for path canonicalization
+
+3. validate_workspace_dir(task_id)
+   - Combines: validate_task_id() + sanitize_path()
+   - Returns: Canonical workspace path
+   - Use case: Before creating workspace directories
+
+4. validate_file_readable(file_path)
+   - Checks: File exists (-f) and is readable (-r)
+   - Returns: 0 if accessible, 1 otherwise
+   - Use case: Before reading tasks.csv or other files
+
+=================================================================================
+ATTACK VECTORS BLOCKED
+=================================================================================
+
+1. Semicolon injection:      TASK-001; rm -rf /
+2. Backtick injection:        TASK-`whoami`-001
+3. Command substitution:      TASK-$(whoami)-001
+4. Path traversal:            ../../../etc/passwd
+5. Absolute path escape:      /etc/passwd
+6. Empty string exploitation: ""
+7. Null byte injection:       TASK-001\x00malicious
+
+=================================================================================
+TEST COVERAGE
+=================================================================================
+
+Unit Tests (Per Function):
+  - Valid inputs accepted (all 6 TASK_ID prefixes)
+  - Invalid inputs rejected
+  - Error messages clear
+  - Edge cases handled
+
+Security Tests:
+  - All 7 attack vectors blocked
+  - No false positives
+  - No false negatives
+
+Integration Tests:
+  - Library sources from multiple directories
+  - Functions exported correctly
+  - No conflicts with existing code
+
+Performance Tests:
+  - Single validation: <1ms
+  - 1000 validations: <1 second
+  - No memory leaks
+
+=================================================================================
+SUCCESS CRITERIA
+=================================================================================
+
+All must be checked before task completion:
+
+[x] Workspace created with all documentation files
+[ ] .claude/lib/input-validation.sh created and executable
+[ ] All 4 validation functions implemented
+[ ] All functions exported
+[ ] All attack vectors blocked (7 scenarios)
+[ ] All valid inputs accepted (6 TASK_ID prefixes)
+[ ] Usage example created and functional
+[ ] Documentation comments complete
+[ ] Git commits atomic and descriptive
+[ ] tasks.csv updated to "completed"
+[ ] Ready for TASK-004 and TASK-005
+
+=================================================================================
+DEPENDENCIES
+=================================================================================
+
+Prerequisites (COMPLETED):
+  - TASK-20251008-001: Initialize Git Repository ✅
+
+Blocking Tasks (Waiting for This):
+  - TASK-20251008-004: Patch atomic-plan.md with Input Validation
+  - TASK-20251008-005: Patch execute-task.md with Input Validation
+
+Related Tasks:
+  - TASK-20251008-006: Harden Permissions in settings.local.json
+
+=================================================================================
+ROLLBACK PROCEDURES
+=================================================================================
+
+Per-Commit Rollback:
+  git reset --soft HEAD~1
+
+Complete Task Rollback:
+  rm -rf .claude/lib/input-validation*.sh
+  git checkout tasks.csv
+  rm -rf .claude/workspace/TASK-20251008-003
+
+Emergency Rollback:
+  git checkout main -- .claude/lib/
+  sed -i '' 's/TASK-20251008-003,...,completed,/TASK-20251008-003,...,pending,/' tasks.csv
+
+=================================================================================
+REFERENCE MATERIALS
+=================================================================================
+
+Code Review Report:
+  File: docs/code-review-reports/code-review-agent_2025-10-08-15.md
+  Lines 110-176: Command injection vulnerability analysis
+  Lines 646-730: Complete reference implementation
+
+Security Standards:
+  - OWASP A03:2021 - Injection
+  - CWE-78: OS Command Injection
+  - Bash security best practices
+
+Internal Documentation:
+  - CLAUDE.md: System overview
+  - settings.local.json: Permissions configuration
+
+=================================================================================
+NEXT STEPS
+=================================================================================
+
+1. Begin Phase 1: Preparation
+   - Verify git status
+   - Create .claude/lib/ directory
+   - Checkout feature branch
+
+2. Follow atomic-plan-TASK-20251008-003.md step-by-step
+
+3. Update checklist-TASK-20251008-003.md as you complete items
+
+4. Record observations in notes.md
+
+5. After completion:
+   - Mark TASK-20251008-003 as "completed" in tasks.csv
+   - Begin TASK-20251008-004 (Patch atomic-plan.md)
+   - Begin TASK-20251008-005 (Patch execute-task.md)
+
+=================================================================================
+WORKSPACE READY FOR EXECUTION
+=================================================================================
+
+Location: /Users/rafaellang/ai-docs/.claude/workspace/TASK-20251008-003/
+Status: Workspace initialized with complete documentation
+Ready: Yes - all planning documents created
+Next: Execute atomic-plan-TASK-20251008-003.md
+
+=================================================================================

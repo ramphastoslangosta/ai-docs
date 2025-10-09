@@ -1,0 +1,96 @@
+/Users/rafaellang/.pyenv/versions/3.9.6/lib/python3.9/site-packages/pytest_asyncio/plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+[1m============================= test session starts ==============================[0m
+platform darwin -- Python 3.9.6, pytest-8.3.4, pluggy-1.5.0 -- /Users/rafaellang/.pyenv/versions/3.9.6/bin/python3.9
+cachedir: .pytest_cache
+rootdir: /Users/rafaellang/cotizador/cotizador_ventanas
+configfile: pytest.ini
+plugins: cov-6.0.0, asyncio-0.25.3, anyio-3.7.1, langsmith-0.3.33
+asyncio: mode=strict, asyncio_default_fixture_loop_scope=None
+[1mcollecting ... [0mcollected 13 items
+
+tests/test_integration_quotes_routes.py::TestQuotesListRoute::test_quotes_list_empty_state [31mERROR[0m[31m [  7%][0m
+tests/test_integration_quotes_routes.py::TestQuotesListRoute::test_quotes_list_without_authentication [31mERROR[0m[31m [ 15%][0m
+tests/test_integration_quotes_routes.py::TestQuotesListRoute::test_quotes_list_single_quote [31mERROR[0m[31m [ 23%][0m
+tests/test_integration_quotes_routes.py::TestQuotesListRoute::test_quotes_list_pagination [31mERROR[0m[31m [ 30%][0m
+tests/test_integration_quotes_routes.py::TestQuotesListRoute::test_quotes_list_pagination_edge_cases [31mERROR[0m[31m [ 38%][0m
+tests/test_integration_quotes_routes.py::TestQuoteListPresenter::test_presenter_processes_quote_correctly [31mFAILED[0m[31m [ 46%][0m
+tests/test_integration_quotes_routes.py::TestQuoteListPresenter::test_presenter_handles_empty_items [31mFAILED[0m[31m [ 53%][0m
+tests/test_integration_quotes_routes.py::TestQuoteListPresenter::test_presenter_handles_corrupted_data [31mFAILED[0m[31m [ 61%][0m
+tests/test_integration_quotes_routes.py::TestQuoteListPresenter::test_presenter_processes_multiple_quotes [31mFAILED[0m[31m [ 69%][0m
+tests/test_integration_quotes_routes.py::TestDatabaseQuoteServicePagination::test_get_quotes_with_limit [31mFAILED[0m[31m [ 76%][0m
+tests/test_integration_quotes_routes.py::TestDatabaseQuoteServicePagination::test_get_quotes_with_offset [31mFAILED[0m[31m [ 84%][0m
+tests/test_integration_quotes_routes.py::TestDatabaseQuoteServicePagination::test_get_quotes_offset_beyond_total [31mFAILED[0m[31m [ 92%][0m
+tests/test_integration_quotes_routes.py::TestDatabaseQuoteServicePagination::test_get_quotes_default_pagination [31mFAILED[0m[31m [100%][0m
+
+==================================== ERRORS ====================================
+[31m[1m______ ERROR at setup of TestQuotesListRoute.test_quotes_list_empty_state ______[0m
+[1m[31mtests/test_integration_quotes_routes.py[0m:96: in test_client
+    [0m[94mfrom[39;49;00m [04m[96mmain[39;49;00m [94mimport[39;49;00m app [94mas[39;49;00m fastapi_app[90m[39;49;00m
+[1m[31mE   ModuleNotFoundError: No module named 'main'[0m
+[31m[1m_ ERROR at setup of TestQuotesListRoute.test_quotes_list_without_authentication _[0m
+[1m[31mtests/test_integration_quotes_routes.py[0m:96: in test_client
+    [0m[94mfrom[39;49;00m [04m[96mmain[39;49;00m [94mimport[39;49;00m app [94mas[39;49;00m fastapi_app[90m[39;49;00m
+[1m[31mE   ModuleNotFoundError: No module named 'main'[0m
+[31m[1m_____ ERROR at setup of TestQuotesListRoute.test_quotes_list_single_quote ______[0m
+[1m[31mtests/test_integration_quotes_routes.py[0m:96: in test_client
+    [0m[94mfrom[39;49;00m [04m[96mmain[39;49;00m [94mimport[39;49;00m app [94mas[39;49;00m fastapi_app[90m[39;49;00m
+[1m[31mE   ModuleNotFoundError: No module named 'main'[0m
+[31m[1m______ ERROR at setup of TestQuotesListRoute.test_quotes_list_pagination _______[0m
+[1m[31mtests/test_integration_quotes_routes.py[0m:96: in test_client
+    [0m[94mfrom[39;49;00m [04m[96mmain[39;49;00m [94mimport[39;49;00m app [94mas[39;49;00m fastapi_app[90m[39;49;00m
+[1m[31mE   ModuleNotFoundError: No module named 'main'[0m
+[31m[1m_ ERROR at setup of TestQuotesListRoute.test_quotes_list_pagination_edge_cases _[0m
+[1m[31mtests/test_integration_quotes_routes.py[0m:96: in test_client
+    [0m[94mfrom[39;49;00m [04m[96mmain[39;49;00m [94mimport[39;49;00m app [94mas[39;49;00m fastapi_app[90m[39;49;00m
+[1m[31mE   ModuleNotFoundError: No module named 'main'[0m
+=================================== FAILURES ===================================
+[31m[1m_______ TestQuoteListPresenter.test_presenter_processes_quote_correctly ________[0m
+[1m[31mtests/test_integration_quotes_routes.py[0m:386: in test_presenter_processes_quote_correctly
+    [0m[94mfrom[39;49;00m [04m[96mapp[39;49;00m[04m[96m.[39;49;00m[04m[96mpresenters[39;49;00m[04m[96m.[39;49;00m[04m[96mquote_presenter[39;49;00m [94mimport[39;49;00m QuoteListPresenter[90m[39;49;00m
+[1m[31mE   ModuleNotFoundError: No module named 'app'[0m
+[31m[1m__________ TestQuoteListPresenter.test_presenter_handles_empty_items ___________[0m
+[1m[31mtests/test_integration_quotes_routes.py[0m:432: in test_presenter_handles_empty_items
+    [0m[94mfrom[39;49;00m [04m[96mapp[39;49;00m[04m[96m.[39;49;00m[04m[96mpresenters[39;49;00m[04m[96m.[39;49;00m[04m[96mquote_presenter[39;49;00m [94mimport[39;49;00m QuoteListPresenter[90m[39;49;00m
+[1m[31mE   ModuleNotFoundError: No module named 'app'[0m
+[31m[1m_________ TestQuoteListPresenter.test_presenter_handles_corrupted_data _________[0m
+[1m[31mtests/test_integration_quotes_routes.py[0m:463: in test_presenter_handles_corrupted_data
+    [0m[94mfrom[39;49;00m [04m[96mapp[39;49;00m[04m[96m.[39;49;00m[04m[96mpresenters[39;49;00m[04m[96m.[39;49;00m[04m[96mquote_presenter[39;49;00m [94mimport[39;49;00m QuoteListPresenter[90m[39;49;00m
+[1m[31mE   ModuleNotFoundError: No module named 'app'[0m
+[31m[1m_______ TestQuoteListPresenter.test_presenter_processes_multiple_quotes ________[0m
+[1m[31mtests/test_integration_quotes_routes.py[0m:496: in test_presenter_processes_multiple_quotes
+    [0m[94mfrom[39;49;00m [04m[96mapp[39;49;00m[04m[96m.[39;49;00m[04m[96mpresenters[39;49;00m[04m[96m.[39;49;00m[04m[96mquote_presenter[39;49;00m [94mimport[39;49;00m QuoteListPresenter[90m[39;49;00m
+[1m[31mE   ModuleNotFoundError: No module named 'app'[0m
+[31m[1m________ TestDatabaseQuoteServicePagination.test_get_quotes_with_limit _________[0m
+[1m[31mtests/test_integration_quotes_routes.py[0m:544: in test_get_quotes_with_limit
+    [0m[94mfrom[39;49;00m [04m[96mdatabase[39;49;00m [94mimport[39;49;00m DatabaseQuoteService[90m[39;49;00m
+[1m[31mE   ModuleNotFoundError: No module named 'database'[0m
+[31m[1m________ TestDatabaseQuoteServicePagination.test_get_quotes_with_offset ________[0m
+[1m[31mtests/test_integration_quotes_routes.py[0m:587: in test_get_quotes_with_offset
+    [0m[94mfrom[39;49;00m [04m[96mdatabase[39;49;00m [94mimport[39;49;00m DatabaseQuoteService[90m[39;49;00m
+[1m[31mE   ModuleNotFoundError: No module named 'database'[0m
+[31m[1m____ TestDatabaseQuoteServicePagination.test_get_quotes_offset_beyond_total ____[0m
+[1m[31mtests/test_integration_quotes_routes.py[0m:628: in test_get_quotes_offset_beyond_total
+    [0m[94mfrom[39;49;00m [04m[96mdatabase[39;49;00m [94mimport[39;49;00m DatabaseQuoteService[90m[39;49;00m
+[1m[31mE   ModuleNotFoundError: No module named 'database'[0m
+[31m[1m____ TestDatabaseQuoteServicePagination.test_get_quotes_default_pagination _____[0m
+[1m[31mtests/test_integration_quotes_routes.py[0m:654: in test_get_quotes_default_pagination
+    [0m[94mfrom[39;49;00m [04m[96mdatabase[39;49;00m [94mimport[39;49;00m DatabaseQuoteService[90m[39;49;00m
+[1m[31mE   ModuleNotFoundError: No module named 'database'[0m
+[36m[1m=========================== short test summary info ============================[0m
+[31mFAILED[0m tests/test_integration_quotes_routes.py::[1mTestQuoteListPresenter::test_presenter_processes_quote_correctly[0m - ModuleNotFoundError: No module named 'app'
+[31mFAILED[0m tests/test_integration_quotes_routes.py::[1mTestQuoteListPresenter::test_presenter_handles_empty_items[0m - ModuleNotFoundError: No module named 'app'
+[31mFAILED[0m tests/test_integration_quotes_routes.py::[1mTestQuoteListPresenter::test_presenter_handles_corrupted_data[0m - ModuleNotFoundError: No module named 'app'
+[31mFAILED[0m tests/test_integration_quotes_routes.py::[1mTestQuoteListPresenter::test_presenter_processes_multiple_quotes[0m - ModuleNotFoundError: No module named 'app'
+[31mFAILED[0m tests/test_integration_quotes_routes.py::[1mTestDatabaseQuoteServicePagination::test_get_quotes_with_limit[0m - ModuleNotFoundError: No module named 'database'
+[31mFAILED[0m tests/test_integration_quotes_routes.py::[1mTestDatabaseQuoteServicePagination::test_get_quotes_with_offset[0m - ModuleNotFoundError: No module named 'database'
+[31mFAILED[0m tests/test_integration_quotes_routes.py::[1mTestDatabaseQuoteServicePagination::test_get_quotes_offset_beyond_total[0m - ModuleNotFoundError: No module named 'database'
+[31mFAILED[0m tests/test_integration_quotes_routes.py::[1mTestDatabaseQuoteServicePagination::test_get_quotes_default_pagination[0m - ModuleNotFoundError: No module named 'database'
+[31mERROR[0m tests/test_integration_quotes_routes.py::[1mTestQuotesListRoute::test_quotes_list_empty_state[0m - ModuleNotFoundError: No module named 'main'
+[31mERROR[0m tests/test_integration_quotes_routes.py::[1mTestQuotesListRoute::test_quotes_list_without_authentication[0m - ModuleNotFoundError: No module named 'main'
+[31mERROR[0m tests/test_integration_quotes_routes.py::[1mTestQuotesListRoute::test_quotes_list_single_quote[0m - ModuleNotFoundError: No module named 'main'
+[31mERROR[0m tests/test_integration_quotes_routes.py::[1mTestQuotesListRoute::test_quotes_list_pagination[0m - ModuleNotFoundError: No module named 'main'
+[31mERROR[0m tests/test_integration_quotes_routes.py::[1mTestQuotesListRoute::test_quotes_list_pagination_edge_cases[0m - ModuleNotFoundError: No module named 'main'
+[31m==================== [31m[1m8 failed[0m, [33m1 warning[0m, [31m[1m5 errors[0m[31m in 0.36s[0m[31m ====================[0m
