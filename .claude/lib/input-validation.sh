@@ -148,3 +148,12 @@ validate_file_readable() {
 
     return 0
 }
+
+# Export all functions for sourcing
+export -f validate_task_id
+export -f sanitize_path
+export -f validate_workspace_dir
+export -f validate_file_readable
+
+# Set loaded flag
+export INPUT_VALIDATION_LOADED=1
