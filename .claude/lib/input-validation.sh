@@ -92,3 +92,31 @@ sanitize_path() {
     echo "$canonical_path"
     return 0
 }
+
+# Validate workspace directory
+# Arguments:
+#   $1 - task_id: TASK_ID to validate
+# Returns:
+#   0 and prints workspace path if valid, 1 if invalid
+# Example:
+#   workspace_dir=$(validate_workspace_dir "TASK-20251008-001")
+validate_workspace_dir() {
+    local task_id="$1"
+
+    # First validate task ID format
+    if ! validate_task_id "$task_id"; then
+        return 1
+    fi
+
+    # Construct workspace path
+    local workspace_dir="$WORKSPACE_ROOT/$task_id"
+
+    # Verify path doesn't escape workspace root
+    local canonical_path
+    if ! canonical_path=$(sanitize_path "$workspace_dir" "."); then
+        return 1
+    fi
+
+    echo "$canonical_path"
+    return 0
+}
