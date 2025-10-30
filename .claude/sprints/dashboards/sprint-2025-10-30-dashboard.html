@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprint Dashboard - AI Software Factory</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .dashboard-header {
+            margin-bottom: 30px;
+        }
+
+        .dashboard-header h1 {
+            font-size: 2.5em;
+            color: #00d4ff;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .metrics-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #2d3561 0%, #1f2544 100%);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #3d4574;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.2);
+        }
+
+        .metric-card .label {
+            font-size: 0.9em;
+            color: #a0a0a0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .metric-card .value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .metric-card.complete .value {
+            color: #4caf50;
+        }
+
+        .metric-card.critical .value {
+            color: #ff4444;
+        }
+
+        .controls-bar {
+            background: #1f2544;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            border: 1px solid #3d4574;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            color: #00d4ff;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-group select, .filter-group input {
+            padding: 10px 15px;
+            border: 1px solid #3d4574;
+            background: #2d3561;
+            color: #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+        }
+
+        .filter-group select:focus, .filter-group input:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+        }
+
+        .filter-group input[type="text"] {
+            width: 250px;
+        }
+
+        .refresh-info {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #a0a0a0;
+            font-size: 0.9em;
+        }
+
+        .refresh-countdown {
+            background: #2d3561;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            color: #ff9800;
+            border: 1px solid #3d4574;
+        }
+
+        .factory-line {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            position: relative;
+            min-height: 600px;
+        }
+
+        .station {
+            background: #1f2544;
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid #3d4574;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: visible;
+        }
+
+        .station::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: -20px;
+            width: 20px;
+            height: 4px;
+            background: linear-gradient(90deg, #00d4ff 0%, transparent 100%);
+            animation: conveyor 2s linear infinite;
+            z-index: 1;
+        }
+
+        .station:last-child::before {
+            display: none;
+        }
+
+        @keyframes conveyor {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+
+        .station-header {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3d4574;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .station-header .title {
+            color: #00d4ff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .station-header .count {
+            background: #2d3561;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            color: #ff9800;
+            font-weight: bold;
+        }
+
+        .task-card {
+            background: linear-gradient(135deg, #2d3561 0%, #252d4a 100%);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .task-card:hover {
+            transform: translateX(5px) scale(1.02);
+            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .task-card.critical {
+            border-left-color: #ff4444;
+        }
+
+        .task-card.high {
+            border-left-color: #ff9800;
+        }
+
+        .task-card.medium {
+            border-left-color: #2196f3;
+        }
+
+        .task-card.low {
+            border-left-color: #757575;
+        }
+
+        .task-id {
+            font-size: 0.85em;
+            color: #00d4ff;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .task-title {
+            font-size: 1em;
+            color: #e0e0e0;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .task-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .priority-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .priority-badge.critical {
+            background: rgba(255, 68, 68, 0.2);
+            color: #ff4444;
+            border: 1px solid #ff4444;
+        }
+
+        .priority-badge.high {
+            background: rgba(255, 152, 0, 0.2);
+            color: #ff9800;
+            border: 1px solid #ff9800;
+        }
+
+        .priority-badge.medium {
+            background: rgba(33, 150, 243, 0.2);
+            color: #2196f3;
+            border: 1px solid #2196f3;
+        }
+
+        .priority-badge.low {
+            background: rgba(117, 117, 117, 0.2);
+            color: #757575;
+            border: 1px solid #757575;
+        }
+
+        .phase-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75em;
+            background: rgba(0, 212, 255, 0.1);
+            color: #00d4ff;
+            border: 1px solid #00d4ff;
+            font-family: 'Courier New', monospace;
+        }
+
+        .effort-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75em;
+            background: rgba(156, 39, 176, 0.2);
+            color: #ce93d8;
+            border: 1px solid #ce93d8;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: #1f2544;
+            margin: 5% auto;
+            padding: 30px;
+            border: 2px solid #3d4574;
+            border-radius: 15px;
+            width: 80%;
+            max-width: 600px;
+            box-shadow: 0 10px 40px rgba(0, 212, 255, 0.3);
+        }
+
+        .close {
+            color: #a0a0a0;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover {
+            color: #ff4444;
+        }
+
+        .empty-station {
+            text-align: center;
+            padding: 40px 20px;
+            color: #606060;
+            font-style: italic;
+        }
+
+        @media (max-width: 1400px) {
+            .factory-line {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .factory-line {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .factory-line {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-header h1 {
+                font-size: 1.8em;
+            }
+
+            .controls-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-group input[type="text"] {
+                width: 100%;
+            }
+
+            .refresh-info {
+                margin-left: 0;
+                justify-content: center;
+            }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #2d3561;
+            border-radius: 10px;
+            margin-top: 15px;
+            overflow: hidden;
+            border: 1px solid #3d4574;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff 0%, #4caf50 100%);
+            width: 0%;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-header">
+        <h1>🏭 AI Software Factory Dashboard</h1>
+
+        <div class="metrics-panel">
+            <div class="metric-card">
+                <div class="label">Sprint Period</div>
+                <div class="value" style="font-size: 1.2em;">10/30 - 11/13</div>
+            </div>
+            <div class="metric-card">
+                <div class="label">Total Tasks</div>
+                <div class="value">9</div>
+            </div>
+            <div class="metric-card complete">
+                <div class="label">Complete</div>
+                <div class="value">0 (0%)</div>
+            </div>
+            <div class="metric-card">
+                <div class="label">In Progress</div>
+                <div class="value">0</div>
+            </div>
+            <div class="metric-card critical">
+                <div class="label">Critical Tasks</div>
+                <div class="value">3</div>
+            </div>
+            <div class="metric-card">
+                <div class="label">Total Effort</div>
+                <div class="value">1.72d</div>
+            </div>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: 0%;"></div>
+        </div>
+    </div>
+
+    <div class="controls-bar">
+        <div class="filter-group">
+            <label for="priorityFilter">Priority:</label>
+            <select id="priorityFilter">
+                <option value="all">All Priorities</option>
+                <option value="critical">Critical</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="phaseFilter">Phase:</label>
+            <select id="phaseFilter">
+                <option value="all">All Phases</option>
+                <option value="phase-1">Phase 1</option>
+                <option value="phase-2">Phase 2</option>
+                <option value="phase-3">Phase 3</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="searchBox">Search:</label>
+            <input type="text" id="searchBox" placeholder="Search by task ID or title...">
+        </div>
+
+        <div class="refresh-info">
+            <span>Auto-refresh in:</span>
+            <span class="refresh-countdown" id="countdown">30s</span>
+        </div>
+    </div>
+
+    <div class="factory-line">
+        <!-- Backlog Station -->
+        <div class="station" id="backlog">
+            <div class="station-header">
+                <span class="title">📋 Backlog</span>
+                <span class="count" id="backlog-count">9</span>
+            </div>
+
+            <div class="task-card critical" data-priority="critical" data-phase="phase-1" data-task-id="TASK-20251008-005">
+                <div class="task-id">TASK-20251008-005</div>
+                <div class="task-title">Patch execute-task.md with Input Validation</div>
+                <div class="task-meta">
+                    <span class="priority-badge critical">Critical</span>
+                    <span class="phase-badge">phase-1</span>
+                    <span class="effort-badge">0.09d</span>
+                </div>
+            </div>
+
+            <div class="task-card critical" data-priority="critical" data-phase="phase-1" data-task-id="TASK-20251008-006">
+                <div class="task-id">TASK-20251008-006</div>
+                <div class="task-title">Harden Permissions in settings.local.json</div>
+                <div class="task-meta">
+                    <span class="priority-badge critical">Critical</span>
+                    <span class="phase-badge">phase-1</span>
+                    <span class="effort-badge">0.06d</span>
+                </div>
+            </div>
+
+            <div class="task-card critical" data-priority="critical" data-phase="phase-1" data-task-id="TASK-20251008-007">
+                <div class="task-id">TASK-20251008-007</div>
+                <div class="task-title">Create Root README.md</div>
+                <div class="task-meta">
+                    <span class="priority-badge critical">Critical</span>
+                    <span class="phase-badge">phase-1</span>
+                    <span class="effort-badge">0.25d</span>
+                </div>
+            </div>
+
+            <div class="task-card high" data-priority="high" data-phase="phase-2" data-task-id="TASK-20251008-008">
+                <div class="task-id">TASK-20251008-008</div>
+                <div class="task-title">Implement Automated Workspace Cleanup</div>
+                <div class="task-meta">
+                    <span class="priority-badge high">High</span>
+                    <span class="phase-badge">phase-2</span>
+                    <span class="effort-badge">0.38d</span>
+                </div>
+            </div>
+
+            <div class="task-card high" data-priority="high" data-phase="phase-2" data-task-id="TASK-20251008-009">
+                <div class="task-id">TASK-20251008-009</div>
+                <div class="task-title">Archive Completed Workspace TASK-20250929-012</div>
+                <div class="task-meta">
+                    <span class="priority-badge high">High</span>
+                    <span class="phase-badge">phase-2</span>
+                    <span class="effort-badge">0.06d</span>
+                </div>
+            </div>
+
+            <div class="task-card high" data-priority="high" data-phase="phase-2" data-task-id="TASK-20251008-010">
+                <div class="task-id">TASK-20251008-010</div>
+                <div class="task-title">Resolve Duplicate Workspace Directories</div>
+                <div class="task-meta">
+                    <span class="priority-badge high">High</span>
+                    <span class="phase-badge">phase-2</span>
+                    <span class="effort-badge">0.13d</span>
+                </div>
+            </div>
+
+            <div class="task-card high" data-priority="high" data-phase="phase-2" data-task-id="TASK-20251008-011">
+                <div class="task-id">TASK-20251008-011</div>
+                <div class="task-title">Add Workspace Size Monitoring</div>
+                <div class="task-meta">
+                    <span class="priority-badge high">High</span>
+                    <span class="phase-badge">phase-2</span>
+                    <span class="effort-badge">0.25d</span>
+                </div>
+            </div>
+
+            <div class="task-card medium" data-priority="medium" data-phase="phase-3" data-task-id="TASK-20251008-012">
+                <div class="task-id">TASK-20251008-012</div>
+                <div class="task-title">Extract Shared Workspace Functions</div>
+                <div class="task-meta">
+                    <span class="priority-badge medium">Medium</span>
+                    <span class="phase-badge">phase-3</span>
+                    <span class="effort-badge">0.25d</span>
+                </div>
+            </div>
+
+            <div class="task-card medium" data-priority="medium" data-phase="phase-3" data-task-id="TASK-20251008-013">
+                <div class="task-id">TASK-20251008-013</div>
+                <div class="task-title">Optimize Cleanup-Workspaces File I/O</div>
+                <div class="task-meta">
+                    <span class="priority-badge medium">Medium</span>
+                    <span class="phase-badge">phase-3</span>
+                    <span class="effort-badge">0.25d</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- In Progress Station -->
+        <div class="station" id="inprogress">
+            <div class="station-header">
+                <span class="title">⚙️ In Progress</span>
+                <span class="count" id="inprogress-count">0</span>
+            </div>
+            <div class="empty-station">No tasks in progress</div>
+        </div>
+
+        <!-- Testing Station -->
+        <div class="station" id="testing">
+            <div class="station-header">
+                <span class="title">🧪 Testing</span>
+                <span class="count" id="testing-count">0</span>
+            </div>
+            <div class="empty-station">No tasks in testing</div>
+        </div>
+
+        <!-- Review Station -->
+        <div class="station" id="review">
+            <div class="station-header">
+                <span class="title">👁️ Review</span>
+                <span class="count" id="review-count">0</span>
+            </div>
+            <div class="empty-station">No tasks in review</div>
+        </div>
+
+        <!-- Complete Station -->
+        <div class="station" id="complete">
+            <div class="station-header">
+                <span class="title">✅ Complete</span>
+                <span class="count" id="complete-count">0</span>
+            </div>
+            <div class="empty-station">No completed tasks yet</div>
+        </div>
+    </div>
+
+    <!-- Modal for task details -->
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTaskId" style="color: #00d4ff; margin-bottom: 15px;"></h2>
+            <p id="modalTaskTitle" style="font-size: 1.2em; margin-bottom: 20px; color: #e0e0e0;"></p>
+            <div id="modalTaskDetails" style="color: #a0a0a0; line-height: 1.8;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-refresh countdown
+        let countdown = 30;
+        const countdownElement = document.getElementById('countdown');
+
+        setInterval(() => {
+            countdown--;
+            if (countdown <= 0) {
+                location.reload();
+            }
+            countdownElement.textContent = countdown + 's';
+            if (countdown <= 10) {
+                countdownElement.style.color = '#ff4444';
+            }
+        }, 1000);
+
+        // Filter functionality
+        const priorityFilter = document.getElementById('priorityFilter');
+        const phaseFilter = document.getElementById('phaseFilter');
+        const searchBox = document.getElementById('searchBox');
+        const taskCards = document.querySelectorAll('.task-card');
+
+        function applyFilters() {
+            const priorityValue = priorityFilter.value;
+            const phaseValue = phaseFilter.value;
+            const searchValue = searchBox.value.toLowerCase();
+
+            let visibleCount = 0;
+
+            taskCards.forEach(card => {
+                const cardPriority = card.getAttribute('data-priority');
+                const cardPhase = card.getAttribute('data-phase');
+                const cardTaskId = card.getAttribute('data-task-id').toLowerCase();
+                const cardTitle = card.querySelector('.task-title').textContent.toLowerCase();
+
+                const priorityMatch = priorityValue === 'all' || cardPriority === priorityValue;
+                const phaseMatch = phaseValue === 'all' || cardPhase === phaseValue;
+                const searchMatch = searchValue === '' ||
+                    cardTaskId.includes(searchValue) ||
+                    cardTitle.includes(searchValue);
+
+                if (priorityMatch && phaseMatch && searchMatch) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Update backlog count
+            document.getElementById('backlog-count').textContent = visibleCount;
+        }
+
+        priorityFilter.addEventListener('change', applyFilters);
+        phaseFilter.addEventListener('change', applyFilters);
+        searchBox.addEventListener('input', applyFilters);
+
+        // Task card click handler
+        const modal = document.getElementById('taskModal');
+        const modalTaskId = document.getElementById('modalTaskId');
+        const modalTaskTitle = document.getElementById('modalTaskTitle');
+        const modalTaskDetails = document.getElementById('modalTaskDetails');
+        const closeBtn = document.querySelector('.close');
+
+        taskCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const taskId = card.getAttribute('data-task-id');
+                const taskTitle = card.querySelector('.task-title').textContent;
+                const priority = card.getAttribute('data-priority');
+                const phase = card.getAttribute('data-phase');
+                const effort = card.querySelector('.effort-badge').textContent;
+
+                modalTaskId.textContent = taskId;
+                modalTaskTitle.textContent = taskTitle;
+                modalTaskDetails.innerHTML = `
+                    <p><strong>Priority:</strong> <span style="color: ${getPriorityColor(priority)}; text-transform: uppercase;">${priority}</span></p>
+                    <p><strong>Phase:</strong> ${phase}</p>
+                    <p><strong>Estimated Effort:</strong> ${effort}</p>
+                    <p><strong>Status:</strong> Pending (Backlog)</p>
+                    <p style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #3d4574;">
+                        <em>Click outside to close or use the /atomic-plan command to view detailed execution plan.</em>
+                    </p>
+                `;
+
+                modal.style.display = 'block';
+                console.log('Task clicked:', taskId);
+            });
+        });
+
+        closeBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        function getPriorityColor(priority) {
+            const colors = {
+                'critical': '#ff4444',
+                'high': '#ff9800',
+                'medium': '#2196f3',
+                'low': '#757575'
+            };
+            return colors[priority] || '#e0e0e0';
+        }
+
+        // Animate progress bar on load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.querySelector('.progress-fill').style.width = '0%';
+            }, 100);
+        });
+
+        // Update station counts
+        function updateStationCounts() {
+            const stations = ['backlog', 'inprogress', 'testing', 'review', 'complete'];
+            stations.forEach(station => {
+                const stationElement = document.getElementById(station);
+                const cards = stationElement.querySelectorAll('.task-card');
+                const visibleCards = Array.from(cards).filter(card => card.style.display !== 'none');
+                const countElement = document.getElementById(`${station}-count`);
+                if (countElement) {
+                    countElement.textContent = visibleCards.length;
+                }
+            });
+        }
+
+        // Initial count update
+        updateStationCounts();
+    </script>
+</body>
+</html>
