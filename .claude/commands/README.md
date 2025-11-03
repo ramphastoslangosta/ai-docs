@@ -4,6 +4,50 @@ This directory contains slash command definitions for the Claude Code system.
 
 ## Available Commands
 
+### /dashboard
+
+**Description**: Launch interactive Kanban dashboard web server for drag-and-drop task management
+
+**Usage**: `/dashboard [--port PORT] [--csv-path PATH] [--open]`
+
+**Tools**: Bash, Read, Write
+
+**Complexity**: Complex
+
+**Created**: 2025-10-30
+
+**Example**:
+```bash
+# Start dashboard on default port 8000
+/dashboard
+
+# Start on custom port and auto-open browser
+/dashboard --port 3000 --open
+
+# Use custom CSV path
+/dashboard --csv-path /path/to/tasks.csv
+```
+
+**Key Features**:
+- Interactive Kanban board with 5 columns (Backlog → Planning → In Progress → Review → Deployed)
+- Drag-and-drop task management with automatic CSV updates
+- Factory-themed visual design with animations
+- Real-time statistics dashboard
+- FastAPI backend with uv inline dependencies
+- RESTful API endpoints for task operations
+- Auto-refresh every 30 seconds
+- Phase 1: Task management only (command execution in Phase 2)
+
+**API Endpoints**:
+- `GET /` - Serve dashboard HTML
+- `GET /api/tasks` - Get all tasks as JSON
+- `POST /api/tasks/move` - Update task status
+- `GET /api/health` - Health check
+
+**Related Commands**: /sprint-dashboard, /plan-sprint, /execute-task
+
+---
+
 ### /plan-sprint
 
 **Description**: Plan development sprints by analyzing tasks.csv and grouping work into time-boxed iterations with effort estimates and timelines

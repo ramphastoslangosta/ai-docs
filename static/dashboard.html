@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Dashboard - Interactive Kanban Board</title>
+    <link rel="stylesheet" href="/static/dashboard.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <h1>
+                    <span class="icon">🏭</span>
+                    Task Factory Dashboard
+                </h1>
+                <p class="subtitle">Drag tasks through the production pipeline</p>
+            </div>
+            <div class="header-stats">
+                <div class="stat">
+                    <span class="stat-value" id="total-tasks">0</span>
+                    <span class="stat-label">Total Tasks</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value" id="in-progress-count">0</span>
+                    <span class="stat-label">In Progress</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value" id="completed-count">0</span>
+                    <span class="stat-label">Deployed</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Kanban Board -->
+        <div class="kanban-board">
+            <!-- Backlog Column -->
+            <div class="kanban-column" data-column="backlog">
+                <div class="column-header backlog-header">
+                    <h2>
+                        <span class="column-icon">📦</span>
+                        Backlog
+                    </h2>
+                    <span class="column-count" data-column="backlog">0</span>
+                </div>
+                <div class="column-content" id="backlog-zone" data-column="backlog">
+                    <!-- Tasks will be dynamically inserted here -->
+                </div>
+            </div>
+
+            <!-- Planning Column -->
+            <div class="kanban-column" data-column="planning">
+                <div class="column-header planning-header">
+                    <h2>
+                        <span class="column-icon">📋</span>
+                        Planning
+                    </h2>
+                    <span class="column-count" data-column="planning">0</span>
+                </div>
+                <div class="column-content" id="planning-zone" data-column="planning">
+                    <!-- Tasks will be dynamically inserted here -->
+                </div>
+            </div>
+
+            <!-- In Progress Column -->
+            <div class="kanban-column" data-column="in-progress">
+                <div class="column-header inprogress-header">
+                    <h2>
+                        <span class="column-icon">⚙️</span>
+                        In Progress
+                    </h2>
+                    <span class="column-count" data-column="in-progress">0</span>
+                </div>
+                <div class="column-content" id="in-progress-zone" data-column="in-progress">
+                    <!-- Tasks will be dynamically inserted here -->
+                </div>
+            </div>
+
+            <!-- Review Column -->
+            <div class="kanban-column" data-column="review">
+                <div class="column-header review-header">
+                    <h2>
+                        <span class="column-icon">🔍</span>
+                        Review
+                    </h2>
+                    <span class="column-count" data-column="review">0</span>
+                </div>
+                <div class="column-content" id="review-zone" data-column="review">
+                    <!-- Tasks will be dynamically inserted here -->
+                </div>
+            </div>
+
+            <!-- Deployed Column -->
+            <div class="kanban-column" data-column="deployed">
+                <div class="column-header deployed-header">
+                    <h2>
+                        <span class="column-icon">✅</span>
+                        Deployed
+                    </h2>
+                    <span class="column-count" data-column="deployed">0</span>
+                </div>
+                <div class="column-content" id="deployed-zone" data-column="deployed">
+                    <!-- Tasks will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="dashboard-footer">
+            <p>
+                <span id="last-updated">Last updated: Never</span>
+                <span class="separator">•</span>
+                <a href="/api/health" target="_blank">API Health</a>
+                <span class="separator">•</span>
+                <span>Phase 1: Drag-and-Drop Task Management</span>
+            </p>
+        </footer>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p>Loading tasks...</p>
+    </div>
+
+    <!-- Error Toast -->
+    <div id="error-toast" class="error-toast hidden">
+        <span class="error-icon">⚠️</span>
+        <span class="error-message"></span>
+    </div>
+
+    <!-- Success Toast -->
+    <div id="success-toast" class="success-toast hidden">
+        <span class="success-icon">✅</span>
+        <span class="success-message"></span>
+    </div>
+
+    <script src="/static/dashboard.js"></script>
+</body>
+</html>
