@@ -1,5 +1,5 @@
 - [x] Create task branch
-- [ ] Step 4 pending
+- [x] Create test scaffold
 - [ ] Create library file
 - [ ] Add documentation
 - [ ] `list-workspaces` runs without errors
