@@ -102,3 +102,82 @@ get_workspace_progress() {
     echo "$completed_items/$total_items ($progress_pct%)"
     return 0
 }
+
+# =============================================================================
+# Function: update_task_status
+# Purpose: Update task status in tasks.csv file
+#
+# Arguments:
+#   $1 - Task ID (e.g., TASK-20250929-012)
+#   $2 - New status (pending|in-progress|completed|blocked|archived)
+#   $3 - CSV file path (optional, defaults to .claude/tasks.csv)
+#
+# Returns:
+#   Exit code: 0 on success, ERR_* on failure
+#
+# Example:
+#   update_task_status "TASK-20250929-012" "completed"
+#
+# Used in:
+#   - execute-task.md (line 298)
+#   - archive-workspace.md (line 215)
+#   - cleanup-workspaces.md (line 267)
+#   - atomic-plan.md (line 512)
+# =============================================================================
+update_task_status() {
+    local task_id="${1:-}"
+    local new_status="${2:-}"
+    local csv_file="${3:-.claude/tasks.csv}"
+
+    # Validate arguments
+    if [ -z "$task_id" ]; then
+        echo -e "${COLOR_RED}ERROR: Task ID required${COLOR_RESET}" >&2
+        return $ERR_INVALID_ARGUMENT
+    fi
+
+    if [ -z "$new_status" ]; then
+        echo -e "${COLOR_RED}ERROR: Status required${COLOR_RESET}" >&2
+        return $ERR_INVALID_ARGUMENT
+    fi
+
+    # Validate status value
+    case "$new_status" in
+        pending|in-progress|completed|blocked|archived|planning)
+            # Valid status
+            ;;
+        *)
+            echo -e "${COLOR_RED}ERROR: Invalid status: $new_status${COLOR_RESET}" >&2
+            echo "Valid values: pending, in-progress, completed, blocked, archived, planning" >&2
+            return $ERR_INVALID_ARGUMENT
+            ;;
+    esac
+
+    # Validate CSV file exists
+    if [ ! -f "$csv_file" ]; then
+        echo -e "${COLOR_RED}ERROR: CSV file not found: $csv_file${COLOR_RESET}" >&2
+        return $ERR_FILE_NOT_FOUND
+    fi
+
+    # Check if task exists in CSV
+    if ! grep -q "^$task_id," "$csv_file"; then
+        echo -e "${COLOR_RED}ERROR: Task not found in CSV: $task_id${COLOR_RESET}" >&2
+        return $ERR_FILE_NOT_FOUND
+    fi
+
+    # Update status (field 5 in CSV)
+    # macOS sed requires '' after -i for in-place editing
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        sed -i '' "s/^\($task_id,[^,]*,[^,]*,[^,]*,\)[^,]*/\1$new_status/" "$csv_file"
+    else
+        sed -i "s/^\($task_id,[^,]*,[^,]*,[^,]*,\)[^,]*/\1$new_status/" "$csv_file"
+    fi
+
+    # Verify update succeeded
+    if grep -q "^$task_id,.*,$new_status," "$csv_file"; then
+        echo -e "${COLOR_GREEN}✅ Updated $task_id status to: $new_status${COLOR_RESET}"
+        return 0
+    else
+        echo -e "${COLOR_RED}ERROR: Failed to update status${COLOR_RESET}" >&2
+        return $ERR_OPERATION_FAILED
+    fi
+}
