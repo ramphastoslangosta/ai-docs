@@ -1,6 +1,6 @@
 - [x] Create task branch
 - [x] Create test scaffold
-- [ ] Create library file
+- [x] Create library file
 - [ ] Add documentation
 - [ ] `list-workspaces` runs without errors
 - [ ] Progress percentages displayed correctly
