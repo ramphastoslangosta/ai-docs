@@ -181,3 +181,77 @@ update_task_status() {
         return $ERR_OPERATION_FAILED
     fi
 }
+
+# =============================================================================
+# Function: update_checklist_item
+# Purpose: Mark a checklist item as complete or incomplete
+#
+# Arguments:
+#   $1 - Checklist file path
+#   $2 - Item text to match (partial match supported)
+#   $3 - Status: "complete" or "incomplete" (optional, defaults to "complete")
+#
+# Returns:
+#   Exit code: 0 on success, ERR_* on failure
+#
+# Example:
+#   update_checklist_item "workspace/TASK-001/checklist-TASK-001.md" "Create library" "complete"
+#
+# Used in:
+#   - execute-task.md (line 312-325)
+#   - atomic-plan.md (line 478-489)
+# =============================================================================
+update_checklist_item() {
+    local checklist_file="${1:-}"
+    local item_text="${2:-}"
+    local item_status="${3:-complete}"
+
+    # Validate arguments
+    if [ -z "$checklist_file" ]; then
+        echo -e "${COLOR_RED}ERROR: Checklist file path required${COLOR_RESET}" >&2
+        return $ERR_INVALID_ARGUMENT
+    fi
+
+    if [ -z "$item_text" ]; then
+        echo -e "${COLOR_RED}ERROR: Item text required${COLOR_RESET}" >&2
+        return $ERR_INVALID_ARGUMENT
+    fi
+
+    # Validate checklist file exists
+    if [ ! -f "$checklist_file" ]; then
+        echo -e "${COLOR_RED}ERROR: Checklist file not found: $checklist_file${COLOR_RESET}" >&2
+        return $ERR_FILE_NOT_FOUND
+    fi
+
+    # Determine checkbox state
+    local from_state to_state
+    if [ "$item_status" = "complete" ]; then
+        from_state="- \[ \]"
+        to_state="- [x]"
+    else
+        from_state="- \[x\]"
+        to_state="- [ ]"
+    fi
+
+    # Escape special regex characters in item text
+    local escaped_text=$(echo "$item_text" | sed 's/[]\/$*.^[]/\\&/g')
+
+    # Update checklist item
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        sed -i '' "s/^$from_state \(.*$escaped_text.*\)$/$to_state \1/" "$checklist_file"
+    else
+        sed -i "s/^$from_state \(.*$escaped_text.*\)$/$to_state \1/" "$checklist_file"
+    fi
+
+    # Verify update
+    if grep -q "^\- \[x\].*$escaped_text" "$checklist_file"; then
+        echo -e "${COLOR_GREEN}✅ Marked as complete: $item_text${COLOR_RESET}"
+        return 0
+    elif [ "$item_status" = "incomplete" ] && grep -q "^\- \[ \].*$escaped_text" "$checklist_file"; then
+        echo -e "${COLOR_YELLOW}⚪ Marked as incomplete: $item_text${COLOR_RESET}"
+        return 0
+    else
+        echo -e "${COLOR_YELLOW}⚠️  Item may not have been updated: $item_text${COLOR_RESET}" >&2
+        return 0  # Don't fail, just warn
+    fi
+}
