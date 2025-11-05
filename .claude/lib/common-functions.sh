@@ -255,3 +255,49 @@ update_checklist_item() {
         return 0  # Don't fail, just warn
     fi
 }
+
+# =============================================================================
+# Function: append_note
+# Purpose: Append a timestamped note to notes.md file
+#
+# Arguments:
+#   $1 - Note text
+#   $2 - Notes file path (optional, defaults to notes.md in current workspace)
+#   $3 - Timestamp format (optional, defaults to "%Y-%m-%d %H:%M:%S")
+#
+# Returns:
+#   Exit code: 0 on success, ERR_* on failure
+#
+# Example:
+#   append_note "Started implementation" "workspace/TASK-001/notes.md"
+#
+# Used in:
+#   - execute-task.md (line 335-342)
+#   - atomic-plan.md (line 502-509)
+# =============================================================================
+append_note() {
+    local note_text="${1:-}"
+    local notes_file="${2:-notes.md}"
+    local timestamp_format="${3:-%Y-%m-%d %H:%M:%S}"
+
+    # Validate note text provided
+    if [ -z "$note_text" ]; then
+        echo -e "${COLOR_RED}ERROR: Note text required${COLOR_RESET}" >&2
+        return $ERR_INVALID_ARGUMENT
+    fi
+
+    # Create notes file if it doesn't exist
+    if [ ! -f "$notes_file" ]; then
+        echo "# Session Notes" > "$notes_file"
+        echo "" >> "$notes_file"
+    fi
+
+    # Generate timestamp
+    local timestamp=$(date +"$timestamp_format")
+
+    # Append note with timestamp
+    echo "**[$timestamp]** $note_text" >> "$notes_file"
+
+    echo -e "${COLOR_GREEN}📝 Note added: $note_text${COLOR_RESET}"
+    return 0
+}
