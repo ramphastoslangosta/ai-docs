@@ -301,3 +301,75 @@ append_note() {
     echo -e "${COLOR_GREEN}📝 Note added: $note_text${COLOR_RESET}"
     return 0
 }
+
+# =============================================================================
+# Function: git_commit_with_message
+# Purpose: Create a git commit with standardized message format
+#
+# Arguments:
+#   $1 - Commit message
+#   $2 - Files to add (optional, defaults to current directory)
+#   $3 - Task ID to append (optional)
+#
+# Returns:
+#   Exit code: 0 on success, ERR_* on failure
+#
+# Example:
+#   git_commit_with_message "feat: add new function" "lib/*.sh" "ARCH-20251103-001"
+#
+# Used in:
+#   - execute-task.md (line 285-295)
+#   - atomic-plan.md (line 520-530)
+#   - archive-workspace.md (line 133-136)
+# =============================================================================
+git_commit_with_message() {
+    local commit_message="${1:-}"
+    local files="${2:-.}"
+    local task_id="${3:-}"
+
+    # Validate commit message
+    if [ -z "$commit_message" ]; then
+        echo -e "${COLOR_RED}ERROR: Commit message required${COLOR_RESET}" >&2
+        return $ERR_INVALID_ARGUMENT
+    fi
+
+    # Check if in git repository
+    if ! git rev-parse --git-dir > /dev/null 2>&1; then
+        echo -e "${COLOR_YELLOW}⚠️  Not a git repository, skipping commit${COLOR_RESET}" >&2
+        return 0
+    fi
+
+    # Add files
+    if [ -n "$files" ]; then
+        git add $files
+        if [ $? -ne 0 ]; then
+            echo -e "${COLOR_RED}ERROR: Failed to add files${COLOR_RESET}" >&2
+            return $ERR_OPERATION_FAILED
+        fi
+    fi
+
+    # Check if there are changes to commit
+    if git diff --cached --quiet; then
+        echo -e "${COLOR_YELLOW}⚠️  No changes to commit${COLOR_RESET}"
+        return 0
+    fi
+
+    # Append task ID to message if provided
+    local full_message="$commit_message"
+    if [ -n "$task_id" ]; then
+        full_message="$commit_message
+
+Task: $task_id"
+    fi
+
+    # Create commit
+    git commit -m "$full_message"
+
+    if [ $? -eq 0 ]; then
+        echo -e "${COLOR_GREEN}✅ Committed: $commit_message${COLOR_RESET}"
+        return 0
+    else
+        echo -e "${COLOR_RED}ERROR: Git commit failed${COLOR_RESET}" >&2
+        return $ERR_OPERATION_FAILED
+    fi
+}
