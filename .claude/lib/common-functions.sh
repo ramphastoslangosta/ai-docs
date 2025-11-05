@@ -373,3 +373,56 @@ Task: $task_id"
         return $ERR_OPERATION_FAILED
     fi
 }
+
+# =============================================================================
+# Function: format_duration
+# Purpose: Format seconds into human-readable duration
+#
+# Arguments:
+#   $1 - Duration in seconds
+#
+# Returns:
+#   Formatted string (e.g., "2h 15m 30s")
+#   Exit code: 0 on success
+#
+# Example:
+#   format_duration 7530
+#   # Output: "2h 5m 30s"
+#
+# Used in:
+#   - session-report.md (line 156-178)
+#   - sprint-dashboard.md (line 234-245)
+# =============================================================================
+format_duration() {
+    local total_seconds="${1:-0}"
+
+    # Validate input is a number
+    if ! [[ "$total_seconds" =~ ^[0-9]+$ ]]; then
+        echo -e "${COLOR_RED}ERROR: Duration must be a number${COLOR_RESET}" >&2
+        return $ERR_INVALID_ARGUMENT
+    fi
+
+    local days=$(( total_seconds / 86400 ))
+    local hours=$(( (total_seconds % 86400) / 3600 ))
+    local minutes=$(( (total_seconds % 3600) / 60 ))
+    local seconds=$(( total_seconds % 60 ))
+
+    local result=""
+
+    if [ $days -gt 0 ]; then
+        result="${days}d "
+    fi
+
+    if [ $hours -gt 0 ] || [ $days -gt 0 ]; then
+        result="${result}${hours}h "
+    fi
+
+    if [ $minutes -gt 0 ] || [ $hours -gt 0 ] || [ $days -gt 0 ]; then
+        result="${result}${minutes}m "
+    fi
+
+    result="${result}${seconds}s"
+
+    echo "$result"
+    return 0
+}
