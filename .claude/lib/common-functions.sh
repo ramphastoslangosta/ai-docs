@@ -88,9 +88,13 @@ get_workspace_progress() {
         return 0
     fi
 
-    # Count total and completed items
-    local total_items=$(grep -cE "\[ \]|\[x\]" "$checklist_file" 2>/dev/null || echo "0")
-    local completed_items=$(grep -c "\[x\]" "$checklist_file" 2>/dev/null || echo "0")
+    # Count total and completed items (grep -c always returns a number, even if 0)
+    local total_items=$(grep -cE "\[ \]|\[x\]" "$checklist_file" 2>/dev/null)
+    local completed_items=$(grep -c "\[x\]" "$checklist_file" 2>/dev/null)
+
+    # Ensure we have valid numbers (default to 0 if empty)
+    total_items=${total_items:-0}
+    completed_items=${completed_items:-0}
 
     # Calculate percentage
     local progress_pct=0
