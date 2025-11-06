@@ -8,6 +8,13 @@ argument-hint: TASK-ID - Task identifier to archive (e.g., TASK-20250929-012)
 
 Move a completed task workspace to the archive directory with metadata preservation, creating a timestamped snapshot of the completed work. Keeps the active workspace directory clean while maintaining historical records.
 
+## Source Common Functions Library
+```bash
+# Source the common functions library
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../lib/common-functions.sh"
+```
+
 ## Pre-Archive Validation
 
 ### Verify Task ID
@@ -81,26 +88,23 @@ fi
 
 ### Verify Completion Status
 ```bash
-# Check if workspace is actually completed
-if [ -f "$CHECKLIST_FILE" ]; then
-    TOTAL_ITEMS=$(grep -E "\[ \]|\[x\]" "$CHECKLIST_FILE" 2>/dev/null | wc -l | tr -d ' ')
-    COMPLETED_ITEMS=$(grep "\[x\]" "$CHECKLIST_FILE" 2>/dev/null | wc -l | tr -d ' ')
+# Check if workspace is actually completed using library function
+PROGRESS=$(get_workspace_progress "$TASK_ID" "$WORKSPACE_DIR")
+PROGRESS_PCT=$(echo "$PROGRESS" | grep -o '[0-9]*%' | tr -d '%')
 
-    if [ "$TOTAL_ITEMS" -gt 0 ]; then
-        PROGRESS_PCT=$(( COMPLETED_ITEMS * 100 / TOTAL_ITEMS ))
-        echo "📊 Workspace Progress: $COMPLETED_ITEMS/$TOTAL_ITEMS ($PROGRESS_PCT%)"
-    else
-        PROGRESS_PCT=0
-        echo "⚠️  Warning: No checklist items found"
-    fi
+if [ -z "$PROGRESS_PCT" ]; then
+    PROGRESS_PCT=0
+    echo "⚠️  Warning: No checklist items found"
+else
+    echo "📊 Workspace Progress: $PROGRESS"
+fi
 
-    if [ "$PROGRESS_PCT" -lt 100 ]; then
-        echo ""
-        echo "⚠️  Warning: Workspace is not 100% complete"
-        echo "   Progress: $PROGRESS_PCT%"
-        echo "   Incomplete items: $(( TOTAL_ITEMS - COMPLETED_ITEMS ))"
-        echo ""
-        read -p "Archive incomplete workspace? (y/N): " -n 1 -r
+if [ "$PROGRESS_PCT" -lt 100 ]; then
+    echo ""
+    echo "⚠️  Warning: Workspace is not 100% complete"
+    echo "   Progress: $PROGRESS"
+    echo ""
+    read -p "Archive incomplete workspace? (y/N): " -n 1 -r
         echo
         if [[ ! $REPLY =~ ^[Yy]$ ]]; then
             echo "❌ Archive cancelled"
@@ -129,10 +133,8 @@ if git rev-parse --git-dir > /dev/null 2>&1; then
         read -p "Commit before archiving? (Y/n): " -n 1 -r
         echo
         if [[ ! $REPLY =~ ^[Nn]$ ]]; then
-            # Commit workspace before archiving
-            git add "$WORKSPACE_DIR"
-            git commit -m "docs: archive workspace $TASK_ID before archival"
-            echo "✅ Changes committed"
+            # Commit workspace before archiving using library function
+            git_commit_with_message "docs: archive workspace $TASK_ID before archival" "$WORKSPACE_DIR"
         fi
         echo ""
     fi
@@ -221,15 +223,13 @@ if [ -f "tasks.csv" ]; then
         # Create backup
         cp tasks.csv tasks.csv.backup
 
-        # Update status to archived
-        sed -i '' "s/^$TASK_ID,\([^,]*\),[^,]*,/$TASK_ID,\1,archived,/" tasks.csv
+        # Update status to archived using library function
+        update_task_status "$TASK_ID" "archived" "tasks.csv"
 
         # Add archive note
         CURRENT_NOTES=$(grep "^$TASK_ID," tasks.csv | cut -d',' -f12)
         NEW_NOTES="Archived: $TIMESTAMP. $CURRENT_NOTES"
         sed -i '' "s/^$TASK_ID,\(.*\),[^,]*$/\1,$NEW_NOTES/" tasks.csv
-
-        echo "✅ tasks.csv updated"
     else
         echo "ℹ️  Task not found in tasks.csv (skipping update)"
     fi
