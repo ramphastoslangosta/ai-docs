@@ -10,6 +10,13 @@ Display all task workspaces with their current status, progress metrics, and met
 
 ## Discovery
 
+### Source Common Functions Library
+```bash
+# Source the common functions library
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../lib/common-functions.sh"
+```
+
 ### Find All Workspaces
 ```bash
 # Find all workspace directories
@@ -57,19 +64,12 @@ for WORKSPACE_DIR in $WORKSPACES; do
         LAST_MODIFIED="Never"
     fi
 
-    # Calculate progress
-    if [ -f "$CHECKLIST_FILE" ]; then
-        TOTAL_ITEMS=$(grep -E "\[ \]|\[x\]" "$CHECKLIST_FILE" 2>/dev/null | wc -l | tr -d ' ')
-        COMPLETED_ITEMS=$(grep "\[x\]" "$CHECKLIST_FILE" 2>/dev/null | wc -l | tr -d ' ')
+    # Calculate progress using library function
+    PROGRESS=$(get_workspace_progress "$TASK_ID" "$WORKSPACE_DIR")
 
-        if [ "$TOTAL_ITEMS" -gt 0 ]; then
-            PROGRESS_PCT=$(( COMPLETED_ITEMS * 100 / TOTAL_ITEMS ))
-        else
-            PROGRESS_PCT=0
-        fi
-    else
-        TOTAL_ITEMS=0
-        COMPLETED_ITEMS=0
+    # Extract percentage for numeric comparisons
+    PROGRESS_PCT=$(echo "$PROGRESS" | grep -o '[0-9]*%' | tr -d '%')
+    if [ -z "$PROGRESS_PCT" ]; then
         PROGRESS_PCT=0
     fi
 

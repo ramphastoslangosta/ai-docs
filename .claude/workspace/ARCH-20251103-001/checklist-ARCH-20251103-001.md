@@ -1,0 +1,22 @@
+- [x] Create task branch
+- [x] Create test scaffold
+- [x] Create library file
+- [x] Add documentation
+- [x] `list-workspaces` runs without errors
+- [x] Progress percentages displayed correctly
+- [x] `archive-workspace` uses library functions
+- [x] Task status update works
+- [x] No broken functionality in modified commands
+- [x] All 6 functions implemented correctly
+- [x] Test suite passes 100%
+- [x] Documentation complete and accurate
+- [x] 2+ commands successfully refactored
+- [x] No regressions in existing functionality
+- [x] Code follows bash best practices
+- [x] Error handling comprehensive
+- [x] Security considerations addressed
+- [x] Review library code for quality and security
+- [x] Test refactored commands manually
+- [x] Verify no regressions in workspace operations
+- [x] Confirm documentation accuracy
+- [x] Check git history is clean and logical
