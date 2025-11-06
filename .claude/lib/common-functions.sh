@@ -341,7 +341,7 @@ git_commit_with_message() {
 
     # Add files
     if [ -n "$files" ]; then
-        git add $files
+        git add "$files"
         if [ $? -ne 0 ]; then
             echo -e "${COLOR_RED}ERROR: Failed to add files${COLOR_RESET}" >&2
             return $ERR_OPERATION_FAILED
